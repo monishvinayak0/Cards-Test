@@ -43,29 +43,45 @@ public class CardController : MonoBehaviour
         isFlipping = true;
         reachedHalf = false;
 
-        startRotation = transform.rotation;
+        startRotation = Quaternion.Euler(0, 0, 0);
         midRotation = Quaternion.Euler(0, 90, 0);
         endRotation = Quaternion.Euler(0, 180, 0);
+
+        transform.localRotation = startRotation;
     }
 
     void Update()
     {
         if (!isFlipping) return;
 
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, endRotation, Time.deltaTime * flipSpeed * 100f);
+        
 
-        if (!reachedHalf && Quaternion.Angle(transform.rotation, midRotation) < 1f)
+        float currentY = transform.localEulerAngles.y;
+        print(currentY);
+
+        if (!reachedHalf )
         {
-            backImage.gameObject.SetActive(false);
-            frontImage.gameObject.SetActive(true);
-            reachedHalf = true;
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, midRotation, Time.deltaTime * flipSpeed*100f);
+            if (Quaternion.Angle(transform.rotation, midRotation) < 1f)
+            {
+                backImage.gameObject.SetActive(false);
+                frontImage.gameObject.SetActive(true);
+                print("flipped");
+                reachedHalf = true;
+            }
         }
 
-        if (Quaternion.Angle(transform.rotation, endRotation) < 1f)
+        else
         {
-            transform.rotation = endRotation;
-            isFlipping = false;
-            isFlipped = true;
+            // Second half: go to 180°
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, endRotation, Time.deltaTime * flipSpeed * 100f);
+
+            if (Quaternion.Angle(transform.rotation, endRotation) < 1f)
+            {
+                transform.rotation = endRotation;
+                isFlipping = false;
+                isFlipped = true;
+            }
         }
     }
 
@@ -111,6 +127,7 @@ public class CardController : MonoBehaviour
         frontImage.gameObject.SetActive(false);
         backImage.gameObject.SetActive(true);
         transform.rotation = Quaternion.Euler(0, 0, 0);
+        print("card resetted");
     }
 
     public bool IsFlipped()
