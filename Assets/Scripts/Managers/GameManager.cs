@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -13,12 +14,15 @@ public class GameManager : MonoBehaviour
     private CardController firstCard, secondCard;
     private bool canFlip = true;
     private int score = 0;
+    private GridLayoutGroup layoutGrid;
 
     void Start()
     {
+        AdjustGridLayout();
         GenerateCards();
     }
 
+    // Generate the cards with the sprites to the prefab with their id's stored.
     void GenerateCards()
     {
         List<CardData> deck = new();
@@ -45,6 +49,7 @@ public class GameManager : MonoBehaviour
             card.Init(data, this);
             cards.Add(card);
         }
+        
     }
 
     public bool CanFlipCard()
@@ -52,6 +57,8 @@ public class GameManager : MonoBehaviour
         return canFlip && secondCard == null;
     }
 
+
+    //Reveals the card.
     public void OnCardRevealed(CardController card)
     {
         if (firstCard == null)
@@ -65,6 +72,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
+    // Checks for the card matching.
     IEnumerator CheckMatch()
     {
         canFlip = false;
@@ -90,6 +99,7 @@ public class GameManager : MonoBehaviour
         canFlip = true;
     }
 
+    // Shuffle the cards.
     void Shuffle<T>(List<T> list)
     {
         for (int i = 0; i < list.Count; i++)
@@ -100,4 +110,25 @@ public class GameManager : MonoBehaviour
             list[rand] = temp;
         }
     }
+
+    // Adjust the grid layout dynamically.
+    void AdjustGridLayout()
+    {
+        GridLayoutGroup gridLayoutGroup = cardContainer.GetComponent<GridLayoutGroup>();
+        RectTransform cc = cardContainer.GetComponent<RectTransform>();
+        float spacing = gridLayoutGroup.spacing.x; 
+        float paddingHorizontal = gridLayoutGroup.padding.left + gridLayoutGroup.padding.right;
+        float paddingVertical = gridLayoutGroup.padding.top + gridLayoutGroup.padding.bottom;
+
+        float totalWidth = cc.rect.width - paddingHorizontal;
+        float totalHeight = cc.rect.height - paddingVertical;
+
+        float cellWidth = (totalWidth - (columns - 1) * spacing) / columns;
+        float cellHeight = (totalHeight - (rows - 1) * spacing) / rows;
+
+        float cellSize = Mathf.Min(cellWidth, cellHeight);
+
+        gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
+    }
+
 }

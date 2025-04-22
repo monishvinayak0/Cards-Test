@@ -92,7 +92,6 @@ public class CardController : MonoBehaviour
 
     private IEnumerator FlipBackCoroutine()
     {
-        Quaternion mid = Quaternion.Euler(0, 90, 0);
         Quaternion back = Quaternion.Euler(0, 0, 0);
         reachedHalf = false;
 
@@ -100,10 +99,13 @@ public class CardController : MonoBehaviour
         {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, back, Time.deltaTime * flipSpeed * 100f);
 
-            if (!reachedHalf && Quaternion.Angle(transform.rotation, mid) < 1f)
+            float currentY = transform.localEulerAngles.y;
+
+            if (!reachedHalf && (currentY >= 85f && currentY <= 95f))
             {
                 frontImage.gameObject.SetActive(false);
                 backImage.gameObject.SetActive(true);
+                Debug.Log("Flipped back to show back image at Y = " + currentY);
                 reachedHalf = true;
             }
 
@@ -113,6 +115,7 @@ public class CardController : MonoBehaviour
         transform.rotation = back;
         isFlipped = false;
     }
+
 
     public void SetMatched()
     {
