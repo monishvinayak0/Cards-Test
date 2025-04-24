@@ -176,7 +176,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -192,7 +192,7 @@ Canvas:
   m_Enabled: 1
   serializedVersion: 3
   m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_Camera: {fileID: 1877147652}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
@@ -419,8 +419,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 914ba8adbdcd34ae7982b4591a5c3086, type: 3}
   - {fileID: 21300000, guid: 914ba8adbdcd34ae7982b4591a5c3086, type: 3}
   - {fileID: 21300000, guid: 914ba8adbdcd34ae7982b4591a5c3086, type: 3}
-  rows: 2
-  columns: 2
+  - {fileID: 21300000, guid: 914ba8adbdcd34ae7982b4591a5c3086, type: 3}
+  rows: 4
+  columns: 4
 --- !u!4 &1977059631
 Transform:
   m_ObjectHideFlags: 0
@@ -465,6 +466,7 @@ GameObject:
   - component: {fileID: 2032639229}
   - component: {fileID: 2032639228}
   - component: {fileID: 2032639227}
+  - component: {fileID: 2032639231}
   m_Layer: 5
   m_Name: Panel
   m_TagString: Untagged
@@ -489,13 +491,13 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 0
+  m_ChildAlignment: 4
   m_StartCorner: 0
   m_StartAxis: 0
-  m_CellSize: {x: 315, y: 472}
-  m_Spacing: {x: 0, y: 0}
-  m_Constraint: 0
-  m_ConstraintCount: 2
+  m_CellSize: {x: 169, y: 254}
+  m_Spacing: {x: 116.41, y: 20}
+  m_Constraint: 1
+  m_ConstraintCount: 4
 --- !u!114 &2032639228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -554,3 +556,17 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2032639231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2032639226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 0

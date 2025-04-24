@@ -18,8 +18,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        AdjustGridLayout();
+        
         GenerateCards();
+
+       // AdjustGridLayout();
     }
 
     // Generate the cards with the sprites to the prefab with their id's stored.
@@ -116,19 +118,21 @@ public class GameManager : MonoBehaviour
     {
         GridLayoutGroup gridLayoutGroup = cardContainer.GetComponent<GridLayoutGroup>();
         RectTransform cc = cardContainer.GetComponent<RectTransform>();
-        float spacing = gridLayoutGroup.spacing.x; 
+
+        float spacing = gridLayoutGroup.spacing.x;
         float paddingHorizontal = gridLayoutGroup.padding.left + gridLayoutGroup.padding.right;
         float paddingVertical = gridLayoutGroup.padding.top + gridLayoutGroup.padding.bottom;
 
-        float totalWidth = cc.rect.width - paddingHorizontal;
-        float totalHeight = cc.rect.height - paddingVertical;
+        float totalWidth = cc.rect.width - paddingHorizontal - ((columns - 1) * spacing);
+        float totalHeight = cc.rect.height - paddingVertical - ((rows - 1) * spacing);
 
-        float cellWidth = (totalWidth - (columns - 1) * spacing) / columns;
-        float cellHeight = (totalHeight - (rows - 1) * spacing) / rows;
+        float cellWidth = totalWidth / columns;
+        float cellHeight = totalHeight / rows;
 
-        float cellSize = Mathf.Min(cellWidth, cellHeight);
+        float cellSize = Mathf.Min(cellWidth, cellHeight); // make it square
 
         gridLayoutGroup.cellSize = new Vector2(cellSize, cellSize);
     }
+
 
 }

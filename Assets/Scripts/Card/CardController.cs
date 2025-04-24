@@ -92,29 +92,39 @@ public class CardController : MonoBehaviour
 
     private IEnumerator FlipBackCoroutine()
     {
-        Quaternion back = Quaternion.Euler(0, 0, 0);
+        isFlipping = true;
         reachedHalf = false;
 
-        while (Quaternion.Angle(transform.rotation, back) > 1f)
+        Quaternion midRotation = Quaternion.Euler(0, 90, 0);
+        Quaternion endRotation = Quaternion.Euler(0, 0, 0);
+
+        // First half: 180° → 90°
+        while (Quaternion.Angle(transform.localRotation, midRotation) > 0.5f)
         {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, back, Time.deltaTime * flipSpeed * 100f);
-
-            float currentY = transform.localEulerAngles.y;
-
-            if (!reachedHalf && (currentY >= 85f && currentY <= 95f))
-            {
-                frontImage.gameObject.SetActive(false);
-                backImage.gameObject.SetActive(true);
-                Debug.Log("Flipped back to show back image at Y = " + currentY);
-                reachedHalf = true;
-            }
-
+            transform.localRotation = Quaternion.RotateTowards(transform.localRotation, midRotation, Time.deltaTime * flipSpeed * 100f);
             yield return null;
         }
 
-        transform.rotation = back;
+        // Snap to 90°, switch images
+        transform.localRotation = midRotation;
+        frontImage.gameObject.SetActive(false);
+        backImage.gameObject.SetActive(true);
+        Debug.Log("Switched to back image");
+
+        // Second half: 90° → 0°
+        while (Quaternion.Angle(transform.localRotation, endRotation) > 0.5f)
+        {
+            transform.localRotation = Quaternion.RotateTowards(transform.localRotation, endRotation, Time.deltaTime * flipSpeed * 100f);
+            yield return null;
+        }
+
+        // Snap to 0°
+        transform.localRotation = endRotation;
         isFlipped = false;
+        isFlipping = false;
     }
+
+
 
 
     public void SetMatched()
