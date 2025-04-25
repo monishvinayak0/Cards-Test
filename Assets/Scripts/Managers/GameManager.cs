@@ -2,7 +2,11 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Handles the core logic of the card matching game: scoring, flipping, layout, and UI.
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     [Header("Card Setup")]
@@ -11,7 +15,7 @@ public class GameManager : MonoBehaviour
     public List<Sprite> cardSprites;
     public int rows = 2, columns = 2;
 
-    [Header("UI")]
+    [Header("UI Elements")]
     public Text scoreText;
     public Text comboText;
     public Text turnsText;
@@ -19,7 +23,7 @@ public class GameManager : MonoBehaviour
     public Image[] stars;
     public GameObject endCard;
 
-    [Header("Gameplay")]
+    [Header("Level Settings")]
     public int currentLevel = 1;
 
     private List<CardController> cards = new();
@@ -36,28 +40,34 @@ public class GameManager : MonoBehaviour
 
     private string HighScoreKey => $"HighScore_Level_{currentLevel}";
 
-    void Start()
+    private void Start()
     {
         highScore = PlayerPrefs.GetInt(HighScoreKey, 0);
+
         AdjustGridLayout();
         GenerateCards();
         UpdateUI();
     }
 
-    void GenerateCards()
-    {
-        List<CardData> deck = new();
-        totalPairs = (rows * columns) / 2;
+    #region Card Generation & Shuffling
 
+    /// <summary>
+    /// Generates and shuffles cards for the current level.
+    /// </summary>
+    private void GenerateCards()
+    {
+        totalPairs = (rows * columns) / 2;
         if (cardSprites.Count < totalPairs)
         {
-            Debug.LogError("Not enough sprites for this level.");
+            Debug.LogError("Not enough sprites assigned for the number of pairs.");
             return;
         }
 
+        List<CardData> deck = new();
+
         for (int i = 0; i < totalPairs; i++)
         {
-            var sprite = cardSprites[i];
+            Sprite sprite = cardSprites[i];
             deck.Add(new CardData { id = i, frontSprite = sprite });
             deck.Add(new CardData { id = i, frontSprite = sprite });
         }
@@ -78,10 +88,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public bool CanFlipCard()
+    /// <summary>
+    /// Shuffles a generic list.
+    /// </summary>
+    private void Shuffle<T>(List<T> list)
     {
-        return canFlip && secondCard == null;
+        for (int i = 0; i < list.Count; i++)
+        {
+            T temp = list[i];
+            int rand = Random.Range(i, list.Count);
+            list[i] = list[rand];
+            list[rand] = temp;
+        }
     }
+
+    #endregion
+
+    #region Card Matching Logic
+
+    public bool CanFlipCard() => canFlip && secondCard == null;
 
     public void OnCardRevealed(CardController card)
     {
@@ -97,7 +122,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    IEnumerator CheckMatch()
+    private IEnumerator CheckMatch()
     {
         canFlip = false;
         yield return new WaitForSeconds(1f);
@@ -139,7 +164,11 @@ public class GameManager : MonoBehaviour
         canFlip = true;
     }
 
-    void CheckGameEnd()
+    #endregion
+
+    #region Game Completion & UI Updates
+
+    private void CheckGameEnd()
     {
         if (matchCount == totalPairs)
         {
@@ -148,14 +177,14 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void ShowStars()
+    private void ShowStars()
     {
         endCard.SetActive(true);
+
         int perfectTurns = totalPairs;
         float ratio = (float)turns / perfectTurns;
 
         int starCount = 1;
-
         if (ratio <= 1.5f) starCount = 2;
         if (ratio <= 1f) starCount = 3;
 
@@ -163,7 +192,7 @@ public class GameManager : MonoBehaviour
             stars[i].enabled = i < starCount;
     }
 
-    void UpdateUI()
+    private void UpdateUI()
     {
         scoreText.text = $"Score: {score}";
         comboText.text = combo > 1 ? $"Combo x{combo}" : "";
@@ -178,23 +207,14 @@ public class GameManager : MonoBehaviour
         UpdateUI();
     }
 
-    void Shuffle<T>(List<T> list)
-    {
-        for (int i = 0; i < list.Count; i++)
-        {
-            T temp = list[i];
-            int rand = Random.Range(i, list.Count);
-            list[i] = list[rand];
-            list[rand] = temp;
-        }
-    }
+    #endregion
 
-    public void LoadScene(int val)
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(val);
-    }
+    #region Layout & Navigation
 
-    void AdjustGridLayout()
+    /// <summary>
+    /// Dynamically adjusts the card layout based on row/column count.
+    /// </summary>
+    private void AdjustGridLayout()
     {
         GridLayoutGroup gridLayoutGroup = cardContainer.GetComponent<GridLayoutGroup>();
         RectTransform cc = cardContainer.GetComponent<RectTransform>();
@@ -214,4 +234,14 @@ public class GameManager : MonoBehaviour
         gridLayoutGroup.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
         gridLayoutGroup.constraintCount = columns;
     }
+
+    /// <summary>
+    /// Loads the next scene based on index.
+    /// </summary>
+    public void LoadScene(int sceneIndex)
+    {
+        SceneManager.LoadScene(sceneIndex);
+    }
+
+    #endregion
 }
