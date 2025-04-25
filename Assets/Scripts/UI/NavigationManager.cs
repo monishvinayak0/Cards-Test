@@ -5,9 +5,9 @@ using TMPro;
 
 public class NavigationManager : MonoBehaviour
 {
-    // Assign in Unity Inspector
+    
     public GameObject mainPanel;
-    public GameObject[] additionalPanels; // Use this to add more panels
+    public GameObject[] additionalPanels; 
     public Button[] menuButtons;
 
     public Button backButton;

@@ -138,11 +138,11 @@ public class CardController : MonoBehaviour
         isMatched = false;
         isFlipping = false;
 
-        // 🔁 Reset transform cleanly
+        // Reset transform cleanly
         transform.localRotation = Quaternion.identity;
         transform.localEulerAngles = new Vector3(0, 0, 0);
 
-        // 🔒 Force correct image visibility
+        // Force correct image visibility
         frontImage.gameObject.SetActive(false);
         backImage.gameObject.SetActive(true);
     }
@@ -157,9 +157,9 @@ public class CardController : MonoBehaviour
         return isMatched;
     }
 
-    /// <summary>
-    /// Ensures the image visibility matches the card's Y-rotation angle.
-    /// </summary>
+    
+    // Ensures the image visibility matches the card's Y-rotation angle.
+    
     private void SyncImagesToRotation()
     {
         float y = transform.localEulerAngles.y;
