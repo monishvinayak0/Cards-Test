@@ -25,7 +25,8 @@ public class CardController : MonoBehaviour
         cardData = data;
         gameManager = manager;
         frontImage.sprite = cardData.frontSprite;
-        print("front image" + frontImage.name);
+
+        // Force card to default state
         ResetCard();
     }
 
@@ -54,33 +55,28 @@ public class CardController : MonoBehaviour
     {
         if (!isFlipping) return;
 
-        
-
-        float currentY = transform.localEulerAngles.y;
-        print(currentY);
-
-        if (!reachedHalf )
+        if (!reachedHalf)
         {
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, midRotation, Time.deltaTime * flipSpeed*100f);
-            if (Quaternion.Angle(transform.rotation, midRotation) < 1f)
+            transform.localRotation = Quaternion.RotateTowards(transform.localRotation, midRotation, Time.deltaTime * flipSpeed * 100f);
+            if (Quaternion.Angle(transform.localRotation, midRotation) < 1f)
             {
+                // Halfway: show front
                 backImage.gameObject.SetActive(false);
                 frontImage.gameObject.SetActive(true);
-                print("flipped");
                 reachedHalf = true;
             }
         }
-
         else
         {
-            // Second half: go to 180°
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, endRotation, Time.deltaTime * flipSpeed * 100f);
-
-            if (Quaternion.Angle(transform.rotation, endRotation) < 1f)
+            transform.localRotation = Quaternion.RotateTowards(transform.localRotation, endRotation, Time.deltaTime * flipSpeed * 100f);
+            if (Quaternion.Angle(transform.localRotation, endRotation) < 1f)
             {
-                transform.rotation = endRotation;
+                transform.localEulerAngles = new Vector3(0, 180, 0);
                 isFlipping = false;
                 isFlipped = true;
+
+                // Final visual sync
+                SyncImagesToRotation();
             }
         }
     }
@@ -95,37 +91,41 @@ public class CardController : MonoBehaviour
         isFlipping = true;
         reachedHalf = false;
 
-        Quaternion midRotation = Quaternion.Euler(0, 90, 0);
-        Quaternion endRotation = Quaternion.Euler(0, 0, 0);
+        startRotation = Quaternion.Euler(0, 180, 0);
+        midRotation = Quaternion.Euler(0, 90, 0);
+        endRotation = Quaternion.Euler(0, 0, 0);
 
-        // First half: 180° → 90°
-        while (Quaternion.Angle(transform.localRotation, midRotation) > 0.5f)
+        transform.localRotation = startRotation;
+
+        // Phase 1: 180 → 90
+        while (!reachedHalf)
         {
             transform.localRotation = Quaternion.RotateTowards(transform.localRotation, midRotation, Time.deltaTime * flipSpeed * 100f);
+
+            if (Quaternion.Angle(transform.localRotation, midRotation) < 1f)
+            {
+                frontImage.gameObject.SetActive(false);
+                backImage.gameObject.SetActive(true);
+                reachedHalf = true;
+            }
+
             yield return null;
         }
 
-        // Snap to 90°, switch images
-        transform.localRotation = midRotation;
-        frontImage.gameObject.SetActive(false);
-        backImage.gameObject.SetActive(true);
-        Debug.Log("Switched to back image");
-
-        // Second half: 90° → 0°
+        // Phase 2: 90 → 0
         while (Quaternion.Angle(transform.localRotation, endRotation) > 0.5f)
         {
             transform.localRotation = Quaternion.RotateTowards(transform.localRotation, endRotation, Time.deltaTime * flipSpeed * 100f);
             yield return null;
         }
 
-        // Snap to 0°
-        transform.localRotation = endRotation;
+        transform.localEulerAngles = new Vector3(0, 0, 0);
         isFlipped = false;
         isFlipping = false;
+
+        // Final visual sync
+        SyncImagesToRotation();
     }
-
-
-
 
     public void SetMatched()
     {
@@ -137,10 +137,14 @@ public class CardController : MonoBehaviour
         isFlipped = false;
         isMatched = false;
         isFlipping = false;
+
+        // 🔁 Reset transform cleanly
+        transform.localRotation = Quaternion.identity;
+        transform.localEulerAngles = new Vector3(0, 0, 0);
+
+        // 🔒 Force correct image visibility
         frontImage.gameObject.SetActive(false);
         backImage.gameObject.SetActive(true);
-        transform.rotation = Quaternion.Euler(0, 0, 0);
-        print("card resetted");
     }
 
     public bool IsFlipped()
@@ -151,5 +155,28 @@ public class CardController : MonoBehaviour
     public bool IsMatched()
     {
         return isMatched;
+    }
+
+    /// <summary>
+    /// Ensures the image visibility matches the card's Y-rotation angle.
+    /// </summary>
+    private void SyncImagesToRotation()
+    {
+        float y = transform.localEulerAngles.y;
+
+        if (y > 90f && y < 270f)
+        {
+            // Card is facing forward
+            frontImage.gameObject.SetActive(true);
+            backImage.gameObject.SetActive(false);
+            isFlipped = true;
+        }
+        else
+        {
+            // Card is facing back
+            frontImage.gameObject.SetActive(false);
+            backImage.gameObject.SetActive(true);
+            isFlipped = false;
+        }
     }
 }
